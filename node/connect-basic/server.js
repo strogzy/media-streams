@@ -3,12 +3,20 @@ const path = require("path");
 var http = require("http");
 var HttpDispatcher = require("httpdispatcher");
 var WebSocketServer = require("websocket").server;
+require('dotenv').config();
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const BASE_URL = process.env.BASE_URL;
+
+const client = require('twilio')(accountSid, authToken);
 
 var dispatcher = new HttpDispatcher();
 var wsserver = http.createServer(handleRequest);
 
 const HTTP_SERVER_PORT = 8080;
 const REPEAT_THRESHOLD = 50;
+
 
 var mediaws = new WebSocketServer({
   httpServer: wsserver,
@@ -42,6 +50,29 @@ dispatcher.onPost("/twiml", function (req, res) {
   readStream.pipe(res);
 });
 
+dispatcher.onPost("/dtmf", function (req, res) {
+  log("POST TwiML");
+
+  var filePath = path.join(__dirname + "/templates", "dtmf.xml");
+  var stat = fs.statSync(filePath);
+
+  res.writeHead(200, {
+    "Content-Type": "text/xml",
+    "Content-Length": stat.size,
+  });
+
+  var readStream = fs.createReadStream(filePath);
+  readStream.pipe(res);
+});
+
+
+dispatcher.onPost("/process_gather", function (req, res) {
+  log("POST process_gather");
+  console.log(`Gather data: ${req.body}`);
+  res.end('OK');
+});
+
+
 mediaws.on("connect", function (connection) {
   log("From Twilio: Connection accepted");
   new MediaStream(connection);
@@ -65,6 +96,8 @@ class MediaStream {
       }
       if (data.event === "start") {
         log("From Twilio: Start event received: ", data);
+        this.callSid = data.start.callSid;
+
       }
       if (data.event === "media") {
         if (!this.hasSeenMedia) {
@@ -130,14 +163,25 @@ class MediaStream {
     };
     log("To Twilio: Sending mark event", markMessage);
     this.connection.sendUTF(JSON.stringify(markMessage));
+    
     this.repeatCount++;
     if (this.repeatCount === 5) {
       log(`Server: Repeated ${this.repeatCount} times...closing`);
+      this.repeatCount = 0;
+      this.messages = [];
       this.connection.close(1000, "Repeated 5 times");
+      
+      log(`Server: switch to DTMF`);
+
+      client.calls(this.callSid)
+      .update({method: 'POST', url: `https://${BASE_URL}/dtmf`})
+      .then(call => console.log(call.to));
+  
     }
   }
 
   close() {
+    this.connection.close(1000, "Repeated 5 times");
     log("Server: Closed");
   }
 }

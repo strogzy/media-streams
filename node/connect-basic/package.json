@@ -17,7 +17,9 @@
   },
   "homepage": "",
   "dependencies": {
+    "dotenv": "^16.0.0",
     "httpdispatcher": "^2.1.2",
+    "twilio": "^3.76.1",
     "websocket": "^1.0.28"
   }
 }

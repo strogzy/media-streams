@@ -1,0 +1,8 @@
+<Response>
+  <Gather action="/process_gather" method="POST" input="dtmf" timeout="3" numDigits="1">
+    <Say>Please press one digit on your keypad.
+    </Say>
+  </Gather>
+  <Redirect method="POST">/twiml
+  </Redirect>
+</Response>
