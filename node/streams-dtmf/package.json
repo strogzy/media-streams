@@ -1,7 +1,7 @@
 {
-  "name": "connect-basic",
+  "name": "streams-dtmf",
   "version": "0.0.1",
-  "description": "Basic Connet Streams demo",
+  "description": "Streams DTMF demo",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

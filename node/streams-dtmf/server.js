@@ -69,7 +69,19 @@ dispatcher.onPost("/dtmf", function (req, res) {
 dispatcher.onPost("/process_gather", function (req, res) {
   log("POST process_gather");
   console.log(`Gather data: ${req.body}`);
-  res.end('OK');
+
+  // res.end('OK');
+  var filePath = path.join(__dirname + "/templates", "streams.xml");
+  var stat = fs.statSync(filePath);
+
+  res.writeHead(200, {
+    "Content-Type": "text/xml",
+    "Content-Length": stat.size,
+  });
+
+  var readStream = fs.createReadStream(filePath);
+  readStream.pipe(res);
+
 });
 
 
@@ -166,7 +178,7 @@ class MediaStream {
     
     this.repeatCount++;
     if (this.repeatCount === 5) {
-      log(`Server: Repeated ${this.repeatCount} times...closing`);
+      // log(`Server: Repeated ${this.repeatCount} times...closing`);
       this.repeatCount = 0;
       this.messages = [];
       this.connection.close(1000, "Repeated 5 times");
