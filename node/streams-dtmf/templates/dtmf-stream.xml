@@ -1,0 +1,10 @@
+<Response>
+   <Start>
+       <Stream url="wss://82aa2b8fff17.ngrok.io/audiostream" />
+   </Start>
+  <Gather action="/process_gather" method="POST" input="dtmf" timeout="5" numDigits="5">
+    <Say>Please press a few digits on your keypad
+    </Say>
+  </Gather>
+  <Redirect method="POST">/twiml</Redirect>
+</Response>

@@ -1,0 +1,25 @@
+{
+  "name": "streams-dtmf",
+  "version": "0.0.1",
+  "description": "Streams DTMF demo",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "httpdispatcher": "^2.1.2",
+    "twilio": "^3.76.1",
+    "websocket": "^1.0.28"
+  }
+}
